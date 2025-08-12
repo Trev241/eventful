@@ -1,4 +1,4 @@
-package edu.humber.demo;
+package edu.humber;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

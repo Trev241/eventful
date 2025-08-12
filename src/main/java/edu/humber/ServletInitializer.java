@@ -1,4 +1,4 @@
-package edu.humber.demo;
+package edu.humber;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
