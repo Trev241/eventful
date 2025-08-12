@@ -16,6 +16,10 @@ public class SecurityConfig {
                 .csrf().disable() // For simplicity; enable and configure properly for production
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register", "/login", "/css/**", "/js/**").permitAll() // allow access to these urls
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/events/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/tickets/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // all other requests require authentication
                 )
                 .formLogin(form -> form

@@ -2,6 +2,7 @@ package edu.humber.service;
 
 import edu.humber.model.User;
 import edu.humber.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,9 +24,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
+
         UserBuilder builder = org.springframework.security.core.userdetails.User.withUsername(user.getEmail());
         builder.password(user.getPassword());
-        builder.roles("USER");
+        builder.authorities(authority);
 
         return builder.build();
     }
