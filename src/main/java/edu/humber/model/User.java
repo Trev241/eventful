@@ -1,9 +1,14 @@
 package edu.humber.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.List;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -18,15 +23,10 @@ public class User {
     private Long id;
 
     private String name;
+
     private String email;
+
     private String password;
-
+    
     private String role;
-
-    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Event> hostedEvents;
-
-    @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> purchasedTickets;
-
 }

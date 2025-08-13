@@ -1,11 +1,12 @@
 package edu.humber.service;
 
-import edu.humber.model.User;
-import edu.humber.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import edu.humber.model.User;
+import edu.humber.repository.UserRepository;
 
 @Service
 public class UserService {
@@ -25,6 +26,7 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        user.setRole("USER");
         return userRepository.save(user);
     }
 

@@ -1,10 +1,17 @@
 package edu.humber.model;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 @Entity
 @Table(name = "events")
 @Getter
@@ -19,16 +26,16 @@ public class Event {
     private Long id;
 
     private String title;
+
     private String description;
 
     private LocalDateTime eventDate;
 
     private String location;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id", nullable = false)
-    private User host;
+    private int capacity;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ticket> tickets;
+    private double price;
+
+    private boolean cancelled;
 }
