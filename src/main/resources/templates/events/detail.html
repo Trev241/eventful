@@ -3,41 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${event.title}">Event</title>
+    <title th:text="${event.title} + ' - Eventful'">Event - Eventful</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        .container { max-width: 720px; }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+        }
+        .event-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+        }
+        .info-card {
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+        .detail-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        .price-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .capacity-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .capacity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+        .booking-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .action-btn {
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        .feature-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: #667eea;
+        }
     </style>
 </head>
-<body>
-<div class="container py-4">
-    <h2 class="mb-3" th:text="${event.title}">Event Title</h2>
-    <div class="mb-3 text-muted">
-        <span th:text="${event.eventDate}"></span>
-        <span> • </span>
-        <span th:text="${event.location}"></span>
-    </div>
-    <p th:text="${event.description}"></p>
+<body class="bg-light">
 
-    <div class="mb-4">
-        <span class="badge text-bg-light">Price: </span>
-        <strong th:text="${#numbers.formatDecimal(event.price, 1, 'COMMA', 2, 'POINT')}"></strong>
-        <span class="ms-3 badge" th:classappend="${event.cancelled} ? 'text-bg-danger' : 'text-bg-success'"
-              th:text="${event.cancelled} ? 'Cancelled' : 'Active'"></span>
+<!-- Header -->
+<nav class="navbar navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a th:href="@{/}" class="navbar-brand">
+            <i class="bi bi-calendar-event"></i>
+            Eventful
+        </a>
+        <span class="navbar-text text-white" th:if="${#authentication.isAuthenticated()}">
+            Welcome, <span th:text="${#authentication.name}">User</span>
+            <a href="/logout" class="btn btn-outline-light btn-sm ms-2">Logout</a>
+        </span>
     </div>
+</nav>
 
-    <div class="d-flex gap-2">
-        <a class="btn btn-secondary" th:href="@{/events}">Back</a>
-        <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="btn btn-primary"
-           th:href="@{'/admin/events/' + ${event.id} + '/edit'}">Edit</a>
-        <form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{'/admin/events/' + ${event.id} + '/delete'}" method="post" class="d-inline">
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this event?')">Delete</button>
-        </form>
+<!-- Hero Section -->
+<div class="hero-section position-relative">
+    <div class="event-status">
+        <span th:if="${event.cancelled}" class="badge bg-danger fs-6">CANCELLED</span>
+        <span th:unless="${event.cancelled}" class="badge bg-success fs-6">ACTIVE</span>
     </div>
     
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3" th:text="${event.title}">Event Title</h1>
+                <p class="lead mb-4" th:if="${event.description}" th:text="${event.description}">
+                    Event description goes here...
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-calendar3 me-2"></i>
+                        <span th:text="${#temporals.format(event.eventDate, 'EEEE, MMMM dd, yyyy')}">Date</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clock me-2"></i>
+                        <span th:text="${#temporals.format(event.eventDate, 'HH:mm')}">Time</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        <span th:text="${event.location}">Location</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="price-badge">
+                    $<span th:text="${#numbers.formatDecimal(event.price, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+                <div class="mt-3 text-white-50">per ticket</div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="container">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Event Details Cards -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="info-card card h-100">
+                        <div class="card-body text-center">
+                            <div class="detail-icon mx-auto mb-3">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                            <h5 class="card-title">Date & Time</h5>
+                            <p class="card-text">
+                                <strong th:text="${#temporals.format(event.eventDate, 'MMM dd, yyyy')}">Date</strong><br>
+                                <span th:text="${#temporals.format(event.eventDate, 'EEEE')}">Day</span> at 
+                                <span th:text="${#temporals.format(event.eventDate, 'HH:mm')}">Time</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="info-card card h-100">
+                        <div class="card-body text-center">
+                            <div class="detail-icon mx-auto mb-3">
+                                <i class="bi bi-geo-alt"></i>
+                            </div>
+                            <h5 class="card-title">Location</h5>
+                            <p class="card-text">
+                                <strong th:text="${event.location}">Location</strong><br>
+                                <small class="text-muted">Event venue</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capacity Information -->
+            <div th:if="${hasCapacity}" class="info-card card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-people me-2"></i>
+                        Ticket Availability
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="capacity-bar mb-2">
+                                <div class="capacity-fill" th:style="'width: ' + ${(soldTickets * 100) / event.capacity} + '%'"></div>
+                            </div>
+                            <div class="d-flex justify-content-between text-sm">
+                                <span th:text="${soldTickets} + ' sold'">Sold</span>
+                                <span th:text="${availableTickets} + ' available'">Available</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="h4 mb-0" th:text="${availableTickets}">0</div>
+                            <small class="text-muted">tickets left</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Features -->
+            <div class="info-card card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="bi bi-star me-2"></i>
+                        Event Features
+                    </h5>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div>
+                            <strong>Secure Booking</strong><br>
+                            <small class="text-muted">Your tickets are protected</small>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="bi bi-phone"></i>
+                        </div>
+                        <div>
+                            <strong>Mobile Tickets</strong><br>
+                            <small class="text-muted">Digital tickets on your phone</small>
+                        </div>
+                    </div>
+                    <div class="feature-item" th:unless="${event.cancelled}">
+                        <div class="feature-icon">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </div>
+                        <div>
+                            <strong>Flexible Cancellation</strong><br>
+                            <small class="text-muted">Cancel tickets if plans change</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Sidebar -->
+        <div class="col-lg-4">
+            <div class="booking-section sticky-top">
+                <h4 class="mb-3">Book Your Tickets</h4>
+                
+                <!-- Price Display -->
+                <div class="text-center mb-4">
+                    <div class="h2 text-primary">
+                        $<span th:text="${#numbers.formatDecimal(event.price, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </div>
+                    <small class="text-muted">per ticket</small>
+                </div>
+
+                <!-- Booking Actions -->
+                <div class="d-grid gap-3">
+                    <!-- Book Tickets Button -->
+                    <a th:if="${#authorization.expression('hasRole(''USER'')') and canBook and !event.cancelled}"
+                       th:href="@{'/tickets/book/' + ${event.id}}" 
+                       class="btn btn-primary btn-lg action-btn">
+                        <i class="bi bi-ticket me-2"></i>
+                        Book Tickets Now
+                    </a>
+
+                    <!-- Already Have Tickets -->
+                    <div th:if="${userHasTickets}" class="alert alert-info">
+                        <i class="bi bi-check-circle me-2"></i>
+                        You already have tickets for this event!
+                        <a th:href="@{/tickets}" class="alert-link">View My Tickets</a>
+                    </div>
+
+                    <!-- Cannot Book Messages -->
+                    <div th:if="${event.cancelled}" class="alert alert-danger">
+                        <i class="bi bi-x-circle me-2"></i>
+                        This event has been cancelled
+                    </div>
+
+                    <div th:if="${!canBook and !event.cancelled and #authorization.expression('hasRole(''USER'')')}" class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Tickets are not available
+                    </div>
+
+                    <!-- Login Required -->
+                    <a th:unless="${#authentication.isAuthenticated()}" 
+                       href="/login" class="btn btn-outline-primary btn-lg action-btn">
+                        <i class="bi bi-person me-2"></i>
+                        Login to Book Tickets
+                    </a>
+
+                    <!-- My Tickets Link for Users -->
+                    <a th:if="${#authorization.expression('hasRole(''USER'')')}" 
+                       th:href="@{/tickets}" class="btn btn-outline-secondary action-btn">
+                        <i class="bi bi-ticket-perforated me-2"></i>
+                        My Tickets
+                    </a>
+
+                    <!-- Admin Actions -->
+                    <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="border-top pt-3 mt-3">
+                        <h6 class="text-muted mb-3">Admin Actions</h6>
+                        <a th:href="@{'/admin/events/' + ${event.id} + '/edit'}" 
+                           class="btn btn-warning action-btn w-100 mb-2">
+                            <i class="bi bi-pencil me-2"></i>
+                            Edit Event
+                        </a>
+                        <form th:action="@{'/admin/events/' + ${event.id} + '/delete'}" 
+                              method="post" class="d-grid">
+                            <button type="submit" class="btn btn-danger action-btn" 
+                                    onclick="return confirm('Are you sure you want to delete this event? This action cannot be undone.')">
+                                <i class="bi bi-trash me-2"></i>
+                                Delete Event
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Event Stats for Admin -->
+                <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="mt-4 pt-3 border-top">
+                    <h6 class="text-muted mb-3">Event Statistics</h6>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="h5 mb-0 text-primary" th:text="${soldTickets ?: 0}">0</div>
+                            <small class="text-muted">Tickets Sold</small>
+                        </div>
+                        <div class="col-6" th:if="${hasCapacity}">
+                            <div class="h5 mb-0 text-success" th:text="${availableTickets}">0</div>
+                            <small class="text-muted">Available</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <a th:href="@{/events}" class="btn btn-link">
+                <i class="bi bi-arrow-left me-2"></i>
+                Back to All Events
+            </a>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth scrolling to anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Add animation to cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    });
+</script>
 </body>
 </html>
-
-
