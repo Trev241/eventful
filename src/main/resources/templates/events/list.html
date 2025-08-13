@@ -43,6 +43,12 @@
                 <form th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:action="@{'/admin/events/' + ${event.id} + '/delete'}" method="post" class="d-inline ms-1">
                     <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this event?')">Delete</button>
                 </form>
+                <form th:if="${#authorization.expression('hasRole(''USER'')') and currentUserId != null}"
+                      th:action="@{'/tickets/purchase/' + ${event.id} + '/buyer/' + ${currentUserId}}"
+                      method="post" class="d-inline ms-1">
+                    <input type="hidden" name="price" th:value="${event.price}"/>
+                    <button type="submit" class="btn btn-sm btn-success">Book</button>
+                </form>
             </td>
         </tr>
         </tbody>

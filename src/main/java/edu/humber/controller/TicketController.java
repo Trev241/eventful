@@ -3,6 +3,7 @@ package edu.humber.controller;
 import edu.humber.model.Ticket;
 import edu.humber.service.TicketService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -27,7 +28,12 @@ public class TicketController {
     }
 
     @PostMapping("/purchase/{eventId}/buyer/{buyerId}")
-    public Ticket purchaseTicket(@PathVariable Long eventId, @PathVariable Long buyerId, @RequestParam Double price) {
-        return ticketService.purchaseTicket(eventId, buyerId, price);
+    public Object purchaseTicket(@PathVariable Long eventId,
+                                 @PathVariable Long buyerId,
+                                 @RequestParam Double price,
+                                 RedirectAttributes redirectAttributes ) {
+        ticketService.purchaseTicket(eventId, buyerId, price);
+        redirectAttributes.addFlashAttribute("message", "Ticket booked successfully!");
+        return "redirect:/events";
     }
 }
