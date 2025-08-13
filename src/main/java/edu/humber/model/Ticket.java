@@ -28,9 +28,9 @@ public class Ticket {
 
     private Double price;
 
-    private Event event;
+    private Long eventId;
 
-    private User user;
+    private Long userId;
 
     private boolean cancelled;
 

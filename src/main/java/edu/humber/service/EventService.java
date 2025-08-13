@@ -1,27 +1,22 @@
 package edu.humber.service;
 
-import edu.humber.model.Event;
-import edu.humber.model.User;
-import edu.humber.repository.EventRepository;
-import edu.humber.repository.UserRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import edu.humber.model.Event;
+import edu.humber.repository.EventRepository;
 
 @Service
 public class EventService {
 
     private final EventRepository eventRepository;
-    private final UserRepository userRepository;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository) {
+    public EventService(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
     }
 
-    public Event createEvent(Event event, Long hostId) {
-        User host = userRepository.findById(hostId).orElseThrow(() -> new RuntimeException("Host not found"));
-        event.setHost(host);
+    public Event createEvent(Event event) {
         return eventRepository.save(event);
     }
 
@@ -39,15 +34,13 @@ public class EventService {
         event.setDescription(updatedEvent.getDescription());
         event.setEventDate(updatedEvent.getEventDate());
         event.setLocation(updatedEvent.getLocation());
+        event.setCapacity(updatedEvent.getCapacity());
+        event.setPrice(updatedEvent.getPrice());
+        event.setCancelled(updatedEvent.isCancelled());
         return eventRepository.save(event);
     }
 
     public void deleteEvent(Long id) {
         eventRepository.deleteById(id);
-    }
-
-    public List<Event> getEventsByHost(Long hostId) {
-        User host = userRepository.findById(hostId).orElseThrow(() -> new RuntimeException("Host not found"));
-        return eventRepository.findByHost(host);
     }
 }

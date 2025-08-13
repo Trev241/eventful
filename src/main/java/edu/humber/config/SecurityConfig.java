@@ -15,16 +15,15 @@ public class SecurityConfig {
         http
                 .csrf().disable() // For simplicity; enable and configure properly for production
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login", "/css/**", "/js/**").permitAll() // allow access to these urls
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/register", "/login", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/events/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/tickets/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated() // all other requests require authentication
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")          // your custom login page URL
-                        .defaultSuccessUrl("/", true) // redirect here after successful login
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/")
                         .permitAll()
                 )
                 .logout(logout -> logout

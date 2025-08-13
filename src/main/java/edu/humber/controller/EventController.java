@@ -2,12 +2,13 @@ package edu.humber.controller;
 
 import edu.humber.model.Event;
 import edu.humber.service.EventService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
-@RestController
+@Controller
 @RequestMapping("/events")
 public class EventController {
 
@@ -18,28 +19,15 @@ public class EventController {
     }
 
     @GetMapping
-    public List<Event> getAllEvents() {
-        return eventService.getAllEvents();
+    public String getAllEvents(Model model) {
+        model.addAttribute("events", eventService.getAllEvents());
+        return "events/list";
     }
 
     @GetMapping("/{id}")
-    public Event getEventById(@PathVariable Long id) {
-        return eventService.getEventById(id);
-    }
-
-    @PostMapping("/host/{hostId}")
-    public Event createEvent(@PathVariable Long hostId, @RequestBody Event event) {
-        return eventService.createEvent(event, hostId);
-    }
-
-    @PutMapping("/{id}")
-    public Event updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent) {
-        return eventService.updateEvent(id, updatedEvent);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
-        eventService.deleteEvent(id);
-        return ResponseEntity.noContent().build();
+    public String getEventById(@PathVariable Long id, Model model) {
+        Event event = eventService.getEventById(id);
+        model.addAttribute("event", event);
+        return "events/detail";
     }
 }

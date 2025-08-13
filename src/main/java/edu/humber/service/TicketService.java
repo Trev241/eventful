@@ -1,14 +1,15 @@
 package edu.humber.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import edu.humber.model.Event;
 import edu.humber.model.Ticket;
 import edu.humber.model.User;
 import edu.humber.repository.EventRepository;
 import edu.humber.repository.TicketRepository;
 import edu.humber.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TicketService {
@@ -24,29 +25,21 @@ public class TicketService {
     }
 
     public Ticket purchaseTicket(Long eventId, Long buyerId, Double price) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
-        User buyer = userRepository.findById(buyerId).orElseThrow(() -> new RuntimeException("Buyer not found"));
+        eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
+        userRepository.findById(buyerId).orElseThrow(() -> new RuntimeException("Buyer not found"));
 
         Ticket ticket = Ticket.builder()
-                .event(event)
-                .buyer(buyer)
+                .eventId(eventId)
+                .userId(buyerId)
                 .price(price)
                 .build();
 
-        // Save ticket
-        Ticket savedTicket = ticketRepository.save(ticket);
-
-        // In a real app: Notify the host
-        User host = event.getHost();
-        System.out.println("[NOTIFY] " + host.getEmail() + ": " + buyer.getName() +
-                " has signed up for your event: " + event.getTitle());
-
-        return savedTicket;
+        return ticketRepository.save(ticket);
     }
 
     public List<Ticket> getTicketsByBuyer(Long buyerId) {
-        User buyer = userRepository.findById(buyerId).orElseThrow(() -> new RuntimeException("Buyer not found"));
-        return ticketRepository.findByBuyer(buyer);
+        userRepository.findById(buyerId).orElseThrow(() -> new RuntimeException("Buyer not found"));
+        return ticketRepository.findByUserId(buyerId);
     }
 
     public List<Ticket> getAllTickets() {
