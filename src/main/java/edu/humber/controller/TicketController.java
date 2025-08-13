@@ -2,12 +2,13 @@ package edu.humber.controller;
 
 import edu.humber.model.Ticket;
 import edu.humber.service.TicketService;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/tickets")
 public class TicketController {
 
